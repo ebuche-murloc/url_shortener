@@ -36,27 +36,15 @@ public class MainController {
     private UrlService urlService;
 
     @GetMapping("/")
-    public String greeting(HttpServletRequest req, @RequestHeader(value = "User-Agent") String userAgent, @RequestParam(name="message", required=false, defaultValue="World") String message, Model model) {
-        String clientIp = requestService.getClientIp(req);
+    public String greeting(@RequestParam(name="message", required=false, defaultValue="World") String message, Model model) {
         model.addAttribute("message", message);
-        model.addAttribute("ip", clientIp);
-        model.addAttribute("user-agent", userAgent);
         return "greeting";
     }
 
-//    @GetMapping("/main")
-//    public String main(HttpServletRequest req, @RequestHeader(value = "User-Agent") String userAgent, Model model) {
-//        String clientIp = requestService.getClientIp(req);
-//        model.addAttribute("text", "Иди логинься, если не залогинился - регайся!");
-//        model.addAttribute("ip", clientIp);
-//        model.addAttribute("user-agent", userAgent);
-//        return "main";
-//    }
-
     @GetMapping("/main")
-    public String main( Model model
+    public String main(@AuthenticationPrincipal User user, Model model
     ) {
-        Iterable<LinkItem> linkItems = linkItemRepo.findAll();
+        Iterable<LinkItem> linkItems = linkItemRepo.findAllByAuthor(user);
 
         List<TempLinkItem> tempLinkItems = new ArrayList<>();
         for (LinkItem lItem : linkItems ) {
@@ -69,7 +57,26 @@ public class MainController {
         return "main";
     }
 
-    @PostMapping("/main")
+    @PostMapping("delete")
+    public String delete(
+            @AuthenticationPrincipal User user,
+            @RequestParam int id, Model model
+    ) {
+        linkItemRepo.deleteById(id);
+
+        Iterable<LinkItem> linkItems = linkItemRepo.findAllByAuthor(user);
+        List<TempLinkItem> tempLinkItems = new ArrayList<>();
+        for (LinkItem lItem : linkItems ) {
+            var idd = lItem.getId();
+            var clickCount = logItemRepo.countByLink(lItem);
+            tempLinkItems.add(new TempLinkItem(idd, lItem.getLongURL(), urlService.convertToShortUrl(idd), clickCount));
+        }
+        model.addAttribute("links", tempLinkItems);
+
+        return "main";
+    }
+
+    @PostMapping("/add")
     public String add(
             @AuthenticationPrincipal User user,
             @RequestParam String longURL, Model model
@@ -78,7 +85,7 @@ public class MainController {
 
         linkItemRepo.save(linkItem);
 
-        Iterable<LinkItem> linkItems = linkItemRepo.findAll();
+        Iterable<LinkItem> linkItems = linkItemRepo.findAllByAuthor(user);
         List<TempLinkItem> tempLinkItems = new ArrayList<>();
         for (LinkItem lItem : linkItems ) {
             var id = lItem.getId();

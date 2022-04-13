@@ -6,4 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface LogItemRepo extends CrudRepository<LogItem, Long> {
     long countByLink(LinkItem linkItem);
+    Iterable<LogItem> findAllByLink(LinkItem linkItem);
 }

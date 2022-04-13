@@ -8,22 +8,28 @@
         </form>
     </div>
     <div>
-        <form method="post">
+        <form action="/add" method="post">
             <input type="text" name="longURL" placeholder="Введите ссылку" />
             <button type="submit">Добавить</button>
             <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
         </form>
     </div>
-        {{!
-        <div>{{ip}}{{!</div>
-<div>{{user-agent}}{{!</div>
-    }}
     {{#links}}
         <div>
             <b>{{id}}</b>
             <span>{{longUrl}}</span>
             <i>{{shortUrl}}</i>
             <h1>{{linkClickCount}}</h1>
+            <form method="get" action="checkLinkLogs">
+                <input type="hidden" name="linkId" value="{{id}}"/>
+                <button type="submit">Посмотреть логи ссылки</button>
+                <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+            </form>
+            <form method="post" action="delete">
+                <input type="hidden" name="id" value="{{id}}"/>
+                <button type="submit">Удалить ссылку</button>
+                <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+            </form>
         </div>
     {{/links}}
 </body>
