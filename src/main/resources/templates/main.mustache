@@ -1,5 +1,30 @@
 <html>
+
 <body>
-<div>{{text}}</div>
+    <div>
+        <form action="/logout" method="post">
+            <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+            <input type="submit" value="Sign Out"/>
+        </form>
+    </div>
+    <div>
+        <form method="post">
+            <input type="text" name="longURL" placeholder="Введите ссылку" />
+            <button type="submit">Добавить</button>
+            <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+        </form>
+    </div>
+        {{!
+        <div>{{ip}}{{!</div>
+<div>{{user-agent}}{{!</div>
+    }}
+    {{#links}}
+        <div>
+            <b>{{id}}</b>
+            <span>{{longUrl}}</span>
+            <i>{{shortUrl}}</i>
+            <h1>{{linkClickCount}}</h1>
+        </div>
+    {{/links}}
 </body>
 </html>
